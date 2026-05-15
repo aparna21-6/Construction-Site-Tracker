@@ -56,6 +56,10 @@ const projectSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    attachment: {
+  type: String,
+  default: "",
+},
   },
   { timestamps: true }
 );

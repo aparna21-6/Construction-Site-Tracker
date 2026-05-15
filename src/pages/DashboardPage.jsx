@@ -2,10 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import { useAuth } from "../context/AuthContext";
-import {
-  getAllProjects,
-  deleteProject,
-} from "../services/projectService";
+import { getAllProjects, deleteProject } from "../services/projectService";
+
+const API_BASE_URL = "http://localhost:5000";
 
 const badgeStyles = {
   active: "bg-green-100 text-green-800 border border-green-300",
@@ -80,6 +79,8 @@ function DashboardPage() {
     if (status === "delayed") return "Critical";
     return "Completed";
   };
+
+  const getAttachmentUrl = (attachment) => `${API_BASE_URL}${attachment}`;
 
   const openPdfInNewTab = (doc, fileName) => {
     const blob = doc.output("blob");
@@ -228,6 +229,20 @@ function DashboardPage() {
             <span className="font-medium text-yellow-400">
               Welcome, {currentUser?.username || "User"}
             </span>
+
+            <span className="rounded-full bg-white/20 px-3 py-1 text-sm text-white">
+              Role: {currentUser?.role || "user"}
+            </span>
+
+            {currentUser?.role === "admin" && (
+              <Link
+                to="/admin"
+                className="rounded-xl bg-green-600 px-5 py-3 text-base text-white shadow hover:bg-green-700 md:text-lg"
+              >
+                Admin Panel
+              </Link>
+            )}
+
             <button onClick={handleLogout} className="text-gray-300 hover:text-white">
               Logout
             </button>
@@ -242,7 +257,7 @@ function DashboardPage() {
           </h2>
 
           <div
-            className="mx-auto h-56 w-56 rounded-full md:h-72 md:w-72 relative"
+            className="relative mx-auto h-56 w-56 rounded-full md:h-72 md:w-72"
             style={{
               background: `conic-gradient(
                 #22c55e 0deg ${stableDeg}deg,
@@ -313,8 +328,29 @@ function DashboardPage() {
                 key={site._id}
                 className="rounded-[24px] border border-white/25 bg-white/20 p-5 shadow-2xl backdrop-blur-xl transition hover:bg-white/25 md:p-6"
               >
+                {site.attachment && (
+                  <div className="mb-4 overflow-hidden rounded-2xl bg-white/60">
+                    {site.attachment.toLowerCase().endsWith(".pdf") ? (
+                      <a
+                        href={getAttachmentUrl(site.attachment)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block px-4 py-3 text-center font-semibold text-blue-700 underline"
+                      >
+                        View Attachment PDF
+                      </a>
+                    ) : (
+                      <img
+                        src={getAttachmentUrl(site.attachment)}
+                        alt={site.title}
+                        className="h-44 w-full object-cover"
+                      />
+                    )}
+                  </div>
+                )}
+
                 <div className="min-h-[84px]">
-                  <h3 className="text-2xl font-bold leading-tight text-blue-500 break-words md:text-3xl">
+                  <h3 className="break-words text-2xl font-bold leading-tight text-blue-500 md:text-3xl">
                     {site.title}
                   </h3>
                 </div>
@@ -328,12 +364,19 @@ function DashboardPage() {
                     <span className="text-lg md:text-xl">Status:</span>
                     <span
                       className={`rounded-full px-3 py-1 text-sm font-semibold md:text-base ${
-                        badgeStyles[site.status] || "bg-gray-100 text-gray-700 border border-gray-300"
+                        badgeStyles[site.status] ||
+                        "border border-gray-300 bg-gray-100 text-gray-700"
                       }`}
                     >
                       {statusLabel(site.status)}
                     </span>
                   </div>
+
+                  {site.priority && (
+                    <p className="text-lg md:text-xl">
+                      Priority: <span className="font-semibold capitalize">{site.priority}</span>
+                    </p>
+                  )}
                 </div>
 
                 <div className="my-5 border-b border-white/40" />

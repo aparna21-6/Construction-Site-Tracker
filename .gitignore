@@ -29,5 +29,6 @@ server/node_modules/
 server/.env
 dist/
 build/
+server/uploads/
 *.log
 .vscode/

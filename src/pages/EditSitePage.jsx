@@ -13,6 +13,8 @@ function EditSitePage() {
   const [materials, setMaterials] = useState("");
   const [progress, setProgress] = useState("");
   const [priority, setPriority] = useState("medium");
+  const [attachment, setAttachment] = useState(null);
+  const [existingAttachment, setExistingAttachment] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -26,6 +28,7 @@ function EditSitePage() {
         setMaterials(project.description || "");
         setProgress(project.progress ?? 0);
         setPriority(project.priority || "medium");
+        setExistingAttachment(project.attachment || "");
 
         if (project.status === "active") setStatus("Stable");
         else if (project.status === "pending") setStatus("Monitoring");
@@ -58,13 +61,18 @@ function EditSitePage() {
     try {
       setSaving(true);
 
-      await updateProject(id, {
-        title: projectName.trim(),
-        description: materials,
-        status: backendStatus,
-        progress: Number(progress) || 0,
-        priority,
-      });
+      const formData = new FormData();
+      formData.append("title", projectName.trim());
+      formData.append("description", materials);
+      formData.append("status", backendStatus);
+      formData.append("progress", Number(progress) || 0);
+      formData.append("priority", priority);
+
+      if (attachment) {
+        formData.append("attachment", attachment);
+      }
+
+      await updateProject(id, formData);
 
       alert("Project updated successfully");
       navigate("/projects");
@@ -194,10 +202,55 @@ function EditSitePage() {
               />
             </div>
 
+            <div>
+              <label className="mb-2 block text-2xl font-semibold text-black">
+                Upload Attachment
+              </label>
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,.pdf"
+                onChange={(e) => setAttachment(e.target.files[0])}
+                className="w-full rounded-lg bg-white/90 px-5 py-4 text-lg outline-none"
+              />
+              <p className="mt-2 text-sm text-black/70">
+                Allowed: JPG, JPEG, PNG, WEBP, PDF
+              </p>
+            </div>
+
+            {existingAttachment && (
+              <div className="rounded-xl bg-white/70 p-4">
+                <p className="mb-3 text-lg font-semibold text-black">Current Attachment</p>
+
+                {existingAttachment.endsWith(".pdf") ? (
+                  <a
+                    href={`http://localhost:5000${existingAttachment}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-700 underline"
+                  >
+                    View Current PDF
+                  </a>
+                ) : (
+                  <img
+                    src={`http://localhost:5000${existingAttachment}`}
+                    alt="Current attachment"
+                    className="h-52 w-full rounded-xl object-cover"
+                  />
+                )}
+              </div>
+            )}
+
+            {attachment && (
+              <div className="rounded-xl bg-white/70 p-4 text-black">
+                <p className="text-lg font-semibold">Selected file:</p>
+                <p className="mt-1">{attachment.name}</p>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={saving}
-              className="w-full rounded-lg bg-green-500 px-5 py-4 text-2xl font-bold text-white hover:bg-green-600"
+              className="w-full rounded-lg bg-green-500 px-5 py-4 text-2xl font-bold text-white hover:bg-green-600 disabled:opacity-70"
             >
               {saving ? "Saving..." : "Update Site"}
             </button>

@@ -45,10 +45,14 @@ export const getProjectById = async (id) => {
 };
 
 export const createProject = async (projectData) => {
+  const isFormData = projectData instanceof FormData;
+
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: getHeaders(true),
-    body: JSON.stringify(projectData),
+    headers: isFormData
+      ? { Authorization: `Bearer ${getToken()}` }
+      : getHeaders(true),
+    body: isFormData ? projectData : JSON.stringify(projectData),
   });
 
   const data = await res.json();
@@ -61,10 +65,14 @@ export const createProject = async (projectData) => {
 };
 
 export const updateProject = async (id, projectData) => {
+  const isFormData = projectData instanceof FormData;
+
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
-    headers: getHeaders(true),
-    body: JSON.stringify(projectData),
+    headers: isFormData
+      ? { Authorization: `Bearer ${getToken()}` }
+      : getHeaders(true),
+    body: isFormData ? projectData : JSON.stringify(projectData),
   });
 
   const data = await res.json();

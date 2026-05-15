@@ -26,11 +26,12 @@ export const createProject = async (req, res) => {
       location,
       status,
       priority,
-      startDate,
-      endDate,
+      startDate: startDate || null,
+      endDate: endDate || null,
       groupName,
-      progress,
+      progress: progress ?? 0,
       createdBy: req.user._id,
+      attachment: req.file ? `/uploads/${req.file.filename}` : "",
     });
 
     res.status(201).json(project);
@@ -100,6 +101,10 @@ export const updateProject = async (req, res) => {
         project[field] = req.body[field];
       }
     });
+
+    if (req.file) {
+      project.attachment = `/uploads/${req.file.filename}`;
+    }
 
     const updatedProject = await project.save();
     res.json(updatedProject);

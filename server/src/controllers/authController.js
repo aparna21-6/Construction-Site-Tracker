@@ -43,6 +43,7 @@ export const registerUser = async (req, res) => {
         _id: user._id,
         email: user.email,
         username: user.username,
+         role: user.role,
       },
     });
   } catch (error) {

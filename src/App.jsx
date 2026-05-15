@@ -6,6 +6,7 @@ import DashboardPage from "./pages/DashboardPage";
 import NewSitePage from "./pages/NewSitePage";
 import EditSitePage from "./pages/EditSitePage";
 import SummaryPage from "./pages/SummaryPage";
+import AdminPage from "./pages/AdminPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -50,16 +51,17 @@ function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <AdminPage />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
-  <Route
-  path="/admin"
-  element={
-    <ProtectedRoute allowedRoles={["admin"]}>
-      <AdminPage />
-    </ProtectedRoute>
-  }
-/>
 }
 
 export default App;

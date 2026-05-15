@@ -8,6 +8,7 @@ function NewSitePage() {
   const [budget, setBudget] = useState("");
   const [status, setStatus] = useState("Stable");
   const [materials, setMaterials] = useState("");
+  const [attachment, setAttachment] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -21,30 +22,42 @@ function NewSitePage() {
       return;
     }
 
+    const backendStatus =
+      status === "Critical"
+        ? "delayed"
+        : status === "Monitoring"
+        ? "pending"
+        : "active";
+
+    const priority =
+      status === "Critical"
+        ? "high"
+        : status === "Monitoring"
+        ? "medium"
+        : "low";
+
+    const progress =
+      status === "Critical" ? 15 : status === "Monitoring" ? 50 : 80;
+
     try {
       setLoading(true);
 
-      await createProject({
-        title: projectName.trim(),
-        description: materials,
-        status:
-          status === "Critical"
-            ? "delayed"
-            : status === "Monitoring"
-            ? "pending"
-            : "active",
-        priority:
-          status === "Critical"
-            ? "high"
-            : status === "Monitoring"
-            ? "medium"
-            : "low",
-        progress:
-          status === "Critical" ? 15 : status === "Monitoring" ? 50 : 80,
-        location: "",
-        siteCode: "",
-        groupName: "",
-      });
+      const formData = new FormData();
+      formData.append("title", projectName.trim());
+      formData.append("description", materials);
+      formData.append("status", backendStatus);
+      formData.append("priority", priority);
+      formData.append("progress", progress);
+      formData.append("location", "");
+      formData.append("siteCode", "");
+      formData.append("groupName", "");
+      formData.append("budget", budget);
+
+      if (attachment) {
+        formData.append("attachment", attachment);
+      }
+
+      await createProject(formData);
 
       alert("Project added successfully");
       navigate("/projects");
@@ -143,10 +156,32 @@ function NewSitePage() {
               />
             </div>
 
+            <div>
+              <label className="mb-2 block text-2xl font-semibold text-black">
+                Upload Attachment
+              </label>
+              <input
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,.pdf"
+                onChange={(e) => setAttachment(e.target.files[0])}
+                className="w-full rounded-lg bg-white/90 px-5 py-4 text-lg outline-none"
+              />
+              <p className="mt-2 text-sm text-black/70">
+                Allowed: JPG, JPEG, PNG, WEBP, PDF
+              </p>
+            </div>
+
+            {attachment && (
+              <div className="rounded-xl bg-white/70 p-4 text-black">
+                <p className="text-lg font-semibold">Selected file:</p>
+                <p className="mt-1 break-all">{attachment.name}</p>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-green-500 px-5 py-4 text-2xl font-bold text-white hover:bg-green-600"
+              className="w-full rounded-lg bg-green-500 px-5 py-4 text-2xl font-bold text-white hover:bg-green-600 disabled:opacity-70"
             >
               {loading ? "Adding..." : "Add to Dashboard"}
             </button>
