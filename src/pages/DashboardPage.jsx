@@ -4,7 +4,7 @@ import { jsPDF } from "jspdf";
 import { useAuth } from "../context/AuthContext";
 import { getAllProjects, deleteProject } from "../services/projectService";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const badgeStyles = {
   active: "bg-green-100 text-green-800 border border-green-300",

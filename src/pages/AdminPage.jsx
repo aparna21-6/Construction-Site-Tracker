@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 function AdminPage() {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
@@ -31,8 +33,8 @@ function AdminPage() {
       setLoading(true);
 
       const [dashboardRes, usersRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/admin/dashboard", authHeaders),
-        axios.get("http://localhost:5000/api/admin/users", authHeaders),
+        axios.get(`${API_BASE_URL}/api/admin/dashboard`, authHeaders),
+        axios.get(`${API_BASE_URL}/api/admin/users`, authHeaders),
       ]);
 
       setStats(dashboardRes.data.stats);
@@ -55,7 +57,7 @@ function AdminPage() {
       const newRole = currentRole === "admin" ? "user" : "admin";
 
       await axios.put(
-        `http://localhost:5000/api/admin/users/${userId}/role`,
+        `${API_BASE_URL}/api/admin/users/${userId}/role`,
         { role: newRole },
         authHeaders
       );
@@ -72,7 +74,7 @@ function AdminPage() {
     if (!confirmed) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/admin/users/${userId}`, authHeaders);
+      await axios.delete(`${API_BASE_URL}/api/admin/users/${userId}`, authHeaders);
       fetchAdminData();
     } catch (err) {
       console.error(err);
@@ -188,21 +190,21 @@ function AdminPage() {
           <div className="rounded-[24px] border border-white/25 bg-white/20 p-5 shadow-2xl backdrop-blur-xl md:p-6">
             <p className="text-lg text-black/80 md:text-xl">Total Users</p>
             <h3 className="mt-3 text-4xl font-extrabold text-blue-600 md:text-5xl">
-              {stats.totalUsers}
+              {stats?.totalUsers || 0}
             </h3>
           </div>
 
           <div className="rounded-[24px] border border-white/25 bg-white/20 p-5 shadow-2xl backdrop-blur-xl md:p-6">
             <p className="text-lg text-black/80 md:text-xl">Admin Users</p>
             <h3 className="mt-3 text-4xl font-extrabold text-green-600 md:text-5xl">
-              {stats.totalAdmins}
+              {stats?.totalAdmins || 0}
             </h3>
           </div>
 
           <div className="rounded-[24px] border border-white/25 bg-white/20 p-5 shadow-2xl backdrop-blur-xl md:p-6">
             <p className="text-lg text-black/80 md:text-xl">Regular Users</p>
             <h3 className="mt-3 text-4xl font-extrabold text-yellow-500 md:text-5xl">
-              {stats.totalRegularUsers}
+              {stats?.totalRegularUsers || 0}
             </h3>
           </div>
         </section>

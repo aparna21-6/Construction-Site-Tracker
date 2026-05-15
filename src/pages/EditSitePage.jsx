@@ -223,7 +223,7 @@ function EditSitePage() {
 
                 {existingAttachment.endsWith(".pdf") ? (
                   <a
-                    href={`http://localhost:5000${existingAttachment}`}
+                    href={import.meta.env.VITE_API_URL + existingAttachment}
                     target="_blank"
                     rel="noreferrer"
                     className="text-blue-700 underline"
@@ -232,7 +232,7 @@ function EditSitePage() {
                   </a>
                 ) : (
                   <img
-                    src={`http://localhost:5000${existingAttachment}`}
+                    src={import.meta.env.VITE_API_URL + existingAttachment}
                     alt="Current attachment"
                     className="h-52 w-full rounded-xl object-cover"
                   />

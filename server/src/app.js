@@ -5,7 +5,16 @@ import projectRoutes from "./routes/projectRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://construction-site-tracker-gh7t.vercel.app",
+      "https://construction-site-tracker-gh7t-6ly699hfh.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.get("/", (req, res) => {
